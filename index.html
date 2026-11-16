@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Mini App</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+  <h1 id="greet">লোড হচ্ছে...</h1>
+  <button onclick="alert('কাজ করছে!')">ক্লিক করো</button>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
+
+    const user = tg.initDataUnsafe.user;
+    document.getElementById("greet").innerText =
+      user ? "হ্যালো, " + user.first_name + "!" : "হ্যালো!";
+  </script>
+</body>
+</html>
