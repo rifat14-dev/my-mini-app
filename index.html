@@ -60,13 +60,6 @@
     text-shadow: 0 1px 4px rgba(0,0,0,.5);
   }
 
-  .ground {
-    position: absolute; bottom: 0; left: 0; right: 0;
-    height: 18vh; display: flex; align-items: flex-end;
-    justify-content: space-around; font-size: 44px;
-    background: linear-gradient(transparent, rgba(30,50,10,.55));
-    padding-bottom: 12px;
-  }
   .cloud { position: absolute; top: 6vh; font-size: 40px; opacity: .85; animation: drift 14s linear infinite; }
   .cloud.c2 { top: 16vh; font-size: 30px; animation-duration: 20s; animation-delay: -8s; }
   @keyframes drift { from { left: -15%; } to { left: 105%; } }
@@ -93,8 +86,6 @@
     <div class="seed" id="seed">🌱</div>
   </div>
   <div class="msg" id="msg">PREPARING THE FIELD...</div>
-
-  <div class="ground"><span>🌳</span><span>🏠</span><span>🌻</span><span>🌳</span></div>
 </div>
 
 <div id="home">
