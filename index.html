@@ -47,16 +47,17 @@
   .cloud.c2 { top: 16vh; font-size: 30px; animation-duration: 20s; animation-delay: -8s; }
   @keyframes drift { from { left: -15%; } to { left: 105%; } }
 
-  /* ---------- HOME ---------- */
-  #home { position: fixed; inset: 0; display: none; flex-direction: column; }
-  .topbar {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 12px 14px;
-  }
+  /* ---------- APP LAYOUT ---------- */
+  #app { position: fixed; inset: 0; display: none; flex-direction: column; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; }
   .pill {
     background: rgba(0,0,0,.28); border-radius: 22px; padding: 8px 14px;
     font-weight: bold; font-size: 15px; backdrop-filter: blur(4px);
   }
+  .page { display: none; flex: 1; overflow-y: auto; padding-bottom: 12px; }
+  .page.on { display: block; }
+
+  /* ---------- HOME ---------- */
   .banner { text-align: center; padding: 8px 16px 14px; }
   .banner .big {
     font-size: 34px; font-weight: 900; letter-spacing: 2px; color: #fff176;
@@ -64,16 +65,11 @@
   }
   .banner .sub { margin-top: 6px; font-size: 14px; letter-spacing: 2px; opacity: .95; }
   .hero { font-size: 70px; margin-top: 4px; animation: sway 2.5s ease-in-out infinite; display: inline-block; }
-
-  .cards {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-    padding: 6px 14px; flex: 1; align-content: start;
-  }
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 6px 14px; }
   .card {
     position: relative; border-radius: 20px; padding: 18px 10px; text-align: center;
     background: rgba(255,255,255,.2); border: 2px solid rgba(255,255,255,.35);
-    box-shadow: 0 6px 14px rgba(0,0,0,.18); backdrop-filter: blur(6px);
-    transition: transform .1s;
+    box-shadow: 0 6px 14px rgba(0,0,0,.18); backdrop-filter: blur(6px); transition: transform .1s;
   }
   .card:active { transform: scale(.96); }
   .card .em { font-size: 44px; display: block; }
@@ -86,13 +82,44 @@
   .badge.ok { background: #66bb6a; }
   .card.dim { opacity: .75; }
 
+  /* ---------- FARM ---------- */
+  .sec { margin: 8px 14px 6px; font-size: 13px; letter-spacing: 2px; font-weight: bold; opacity: .9; }
+  .crops { display: flex; gap: 8px; padding: 0 14px; }
+  .crop {
+    flex: 1; padding: 8px 4px; text-align: center; border-radius: 14px; font-size: 12px; font-weight: bold;
+    background: rgba(0,0,0,.25); border: 2px solid transparent;
+  }
+  .crop.sel { border-color: #fff176; background: rgba(0,0,0,.4); }
+  .crop .em { font-size: 28px; display: block; }
+  .crop small { font-weight: normal; opacity: .9; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 14px; }
+  .plot {
+    aspect-ratio: 1; border-radius: 16px; background: #8b5a2b; border: 3px solid #6d4320;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 34px; color: #fff;
+  }
+  .plot small { font-size: 12px; margin-top: 2px; font-weight: bold; }
+  .plot.ready { background: #43a047; border-color: #2e7d32; animation: pulse 1s infinite; }
+  @keyframes pulse { 50% { transform: scale(.95); } }
+  .btn {
+    display: block; width: calc(100% - 28px); margin: 14px 14px 0; padding: 13px; border: none;
+    border-radius: 14px; font-size: 15px; font-weight: bold; letter-spacing: 1px; color: #fff;
+    background: #ef6c00; box-shadow: 0 4px 0 #bf360c;
+  }
+  .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #bf360c; }
+
+  /* ---------- SOON PAGE ---------- */
+  .soonbox { text-align: center; padding: 60px 20px; font-size: 20px; font-weight: bold; letter-spacing: 2px; }
+  .soonbox div { margin-top: 10px; font-size: 13px; font-weight: normal; opacity: .85; }
+
+  /* ---------- NAV ---------- */
   .nav {
     display: flex; justify-content: space-around;
     padding: 10px 6px calc(10px + env(safe-area-inset-bottom));
-    background: rgba(20,45,10,.75); backdrop-filter: blur(8px);
+    background: rgba(20,45,10,.8); backdrop-filter: blur(8px);
     border-top: 1px solid rgba(255,255,255,.2);
   }
-  .nav div { text-align: center; font-size: 11px; letter-spacing: 1px; opacity: .7; min-width: 60px; }
+  .nav div { text-align: center; font-size: 11px; letter-spacing: 1px; opacity: .65; min-width: 60px; }
   .nav div span { display: block; font-size: 24px; margin-bottom: 2px; }
   .nav div.on { opacity: 1; font-weight: bold; }
 
@@ -121,41 +148,62 @@
   <div class="msg" id="msg">PREPARING THE FIELD...</div>
 </div>
 
-<!-- HOME -->
-<div id="home">
+<!-- APP -->
+<div id="app">
   <div class="topbar">
     <div class="pill">👤 <span id="uname">Farmer</span></div>
     <div class="pill">🪙 <span id="coins">0</span></div>
   </div>
 
-  <div class="banner">
-    <div class="hero">🌾</div>
-    <div class="big">FARMING ALIVE</div>
-    <div class="sub">WHAT WILL YOU GROW TODAY?</div>
+  <!-- HOME PAGE -->
+  <div class="page on" id="p-home">
+    <div class="banner">
+      <div class="hero">🌾</div>
+      <div class="big">FARMING ALIVE</div>
+      <div class="sub">WHAT WILL YOU GROW TODAY?</div>
+    </div>
+    <div class="cards">
+      <div class="card" onclick="go('farm')">
+        <span class="em">🌱</span><div class="t">FARM</div><div class="d">Plant &amp; harvest crops</div>
+      </div>
+      <div class="card" onclick="go('shop')">
+        <span class="em">🛒</span><div class="t">SHOP</div><div class="d">Buy seeds, sell crops</div>
+      </div>
+      <div class="card" id="bonusCard" onclick="claimBonus()">
+        <span class="badge" id="bonusBadge">+50</span>
+        <span class="em">🎁</span><div class="t">DAILY BONUS</div><div class="d" id="bonusDesc">Free coins every day</div>
+      </div>
+      <div class="card dim" onclick="toast('🏆 Leaderboard is coming soon!')">
+        <span class="badge">SOON</span>
+        <span class="em">🏆</span><div class="t">LEADERBOARD</div><div class="d">Top farmers</div>
+      </div>
+    </div>
   </div>
 
-  <div class="cards">
-    <div class="card" onclick="soon('Farm')">
-      <span class="em">🌱</span><div class="t">FARM</div><div class="d">Plant &amp; harvest crops</div>
-    </div>
-    <div class="card" onclick="soon('Shop')">
-      <span class="em">🛒</span><div class="t">SHOP</div><div class="d">Buy seeds, sell crops</div>
-    </div>
-    <div class="card" id="bonusCard" onclick="claimBonus()">
-      <span class="badge" id="bonusBadge">+50</span>
-      <span class="em">🎁</span><div class="t">DAILY BONUS</div><div class="d" id="bonusDesc">Free coins every day</div>
-    </div>
-    <div class="card dim" onclick="toast('🏆 Leaderboard is coming soon!')">
-      <span class="badge">SOON</span>
-      <span class="em">🏆</span><div class="t">LEADERBOARD</div><div class="d">Top farmers</div>
-    </div>
+  <!-- FARM PAGE -->
+  <div class="page" id="p-farm">
+    <div class="sec">CHOOSE A CROP, THEN TAP A FIELD</div>
+    <div class="crops" id="crops"></div>
+    <div class="sec">YOUR FIELDS</div>
+    <div class="grid" id="grid"></div>
+    <button class="btn" id="buyPlot"></button>
+  </div>
+
+  <!-- SHOP PAGE -->
+  <div class="page" id="p-shop">
+    <div class="soonbox">🛒 SHOP<div>Coming next</div></div>
+  </div>
+
+  <!-- PROFILE PAGE -->
+  <div class="page" id="p-profile">
+    <div class="soonbox">👤 PROFILE<div>Coming next</div></div>
   </div>
 
   <div class="nav">
-    <div class="on"><span>🏠</span>HOME</div>
-    <div onclick="soon('Farm')"><span>🌱</span>FARM</div>
-    <div onclick="soon('Shop')"><span>🛒</span>SHOP</div>
-    <div onclick="soon('Profile')"><span>👤</span>PROFILE</div>
+    <div id="n-home" class="on" onclick="go('home')"><span>🏠</span>HOME</div>
+    <div id="n-farm" onclick="go('farm')"><span>🌱</span>FARM</div>
+    <div id="n-shop" onclick="go('shop')"><span>🛒</span>SHOP</div>
+    <div id="n-profile" onclick="go('profile')"><span>👤</span>PROFILE</div>
   </div>
 </div>
 
@@ -165,40 +213,44 @@
   const tg = window.Telegram.WebApp;
   tg.ready();
   tg.expand();
-  try {
-    tg.setHeaderColor("#4fc3f7");
-    tg.setBackgroundColor("#4fc3f7");
-  } catch (e) {}
+  try { tg.setHeaderColor("#4fc3f7"); tg.setBackgroundColor("#4fc3f7"); } catch (e) {}
 
-  /* ---------- SAVE DATA ---------- */
-  const KEY = "farming_alive_home_v1";
-  let state = { coins: 30, lastBonus: "" };
+  /* ---------- DATA ---------- */
+  const CROPS = {
+    rice:   { n: "Rice",   e: "🌾", cost: 5,  time: 10, sell: 12 },
+    tomato: { n: "Tomato", e: "🍅", cost: 20, time: 30, sell: 55 },
+    corn:   { n: "Corn",   e: "🌽", cost: 50, time: 60, sell: 140 }
+  };
+  const KEY = "farming_alive_full_v1";
+  const MAX_PLOTS = 12;
+  let state = { coins: 30, lastBonus: "", plots: [null, null, null, null] };
   try {
     const s = JSON.parse(localStorage.getItem(KEY));
-    if (s && typeof s.coins === "number") state = s;
+    if (s && typeof s.coins === "number" && s.plots) state = s;
   } catch (e) {}
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  let selected = "rice";
 
-  /* ---------- HELPERS ---------- */
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
   function toast(m) {
     const t = document.getElementById("toast");
     t.innerText = m; t.classList.add("show");
     clearTimeout(toast.id);
-    toast.id = setTimeout(() => t.classList.remove("show"), 1800);
+    toast.id = setTimeout(() => t.classList.remove("show"), 1500);
   }
   function haptic() { try { tg.HapticFeedback.impactOccurred("light"); } catch (e) {} }
-  function soon(name) { haptic(); toast("🚧 " + name + " page is coming next!"); }
   function today() { return new Date().toISOString().slice(0, 10); }
 
-  /* ---------- DAILY BONUS ---------- */
-  function renderBonus() {
-    const done = state.lastBonus === today();
-    const badge = document.getElementById("bonusBadge");
-    document.getElementById("bonusDesc").innerText = done ? "Come back tomorrow" : "Free coins every day";
-    badge.innerText = done ? "CLAIMED" : "+50";
-    badge.className = "badge" + (done ? " ok" : "");
-    document.getElementById("bonusCard").classList.toggle("dim", done);
+  /* ---------- NAVIGATION ---------- */
+  function go(name) {
+    ["home", "farm", "shop", "profile"].forEach(p => {
+      document.getElementById("p-" + p).classList.toggle("on", p === name);
+      document.getElementById("n-" + p).classList.toggle("on", p === name);
+    });
+    haptic();
+    render();
   }
+
+  /* ---------- DAILY BONUS ---------- */
   function claimBonus() {
     if (state.lastBonus === today()) { toast("Already claimed today ✅"); return; }
     state.coins += 50;
@@ -208,14 +260,80 @@
     render();
   }
 
+  /* ---------- FARM ---------- */
+  function plotCost() { return 100 * (state.plots.length - 3); }
+
+  function selectCrop(k) { selected = k; render(); }
+
+  function tapPlot(i) {
+    const p = state.plots[i];
+    if (!p) {
+      const c = CROPS[selected];
+      if (state.coins < c.cost) { toast("Not enough coins 🪙"); return; }
+      state.coins -= c.cost;
+      state.plots[i] = { c: selected, t: Date.now() };
+      haptic();
+    } else {
+      const c = CROPS[p.c];
+      const left = c.time - (Date.now() - p.t) / 1000;
+      if (left > 0) { toast("Not ready yet ⏳"); return; }
+      state.coins += c.sell;
+      state.plots[i] = null;
+      toast("+" + c.sell + " 🪙");
+      haptic();
+    }
+    save(); render();
+  }
+
+  function buyPlot() {
+    if (state.plots.length >= MAX_PLOTS) return;
+    const cost = plotCost();
+    if (state.coins < cost) { toast("Not enough coins 🪙"); return; }
+    state.coins -= cost;
+    state.plots.push(null);
+    haptic(); save(); render();
+  }
+  document.getElementById("buyPlot").onclick = buyPlot;
+
+  /* ---------- RENDER ---------- */
   function render() {
     document.getElementById("coins").innerText = state.coins;
-    renderBonus();
+
+    // bonus card
+    const done = state.lastBonus === today();
+    const badge = document.getElementById("bonusBadge");
+    document.getElementById("bonusDesc").innerText = done ? "Come back tomorrow" : "Free coins every day";
+    badge.innerText = done ? "CLAIMED" : "+50";
+    badge.className = "badge" + (done ? " ok" : "");
+    document.getElementById("bonusCard").classList.toggle("dim", done);
+
+    // farm page
+    if (!document.getElementById("p-farm").classList.contains("on")) return;
+
+    document.getElementById("crops").innerHTML = Object.keys(CROPS).map(k => {
+      const c = CROPS[k];
+      return '<div class="crop ' + (k === selected ? "sel" : "") + '" onclick="selectCrop(\'' + k + '\')">' +
+        '<span class="em">' + c.e + '</span>' + c.n +
+        '<br><small>🪙' + c.cost + ' → ' + c.sell + '</small><br><small>⏱ ' + c.time + 's</small></div>';
+    }).join("");
+
+    document.getElementById("grid").innerHTML = state.plots.map((p, i) => {
+      if (!p) return '<div class="plot" onclick="tapPlot(' + i + ')">➕</div>';
+      const c = CROPS[p.c];
+      const left = Math.ceil(c.time - (Date.now() - p.t) / 1000);
+      if (left <= 0) return '<div class="plot ready" onclick="tapPlot(' + i + ')">' + c.e + '<small>HARVEST!</small></div>';
+      return '<div class="plot" onclick="tapPlot(' + i + ')">🌱<small>' + left + 's</small></div>';
+    }).join("");
+
+    const b = document.getElementById("buyPlot");
+    if (state.plots.length >= MAX_PLOTS) b.style.display = "none";
+    else { b.style.display = "block"; b.innerText = "➕ BUY NEW FIELD (🪙 " + plotCost() + ")"; }
   }
 
   const user = tg.initDataUnsafe && tg.initDataUnsafe.user;
   if (user) document.getElementById("uname").innerText = user.first_name;
   render();
+  setInterval(render, 1000);
 
   /* ---------- LOADING ANIMATION ---------- */
   const msgs = ["PREPARING THE FIELD...", "PLANTING SEEDS...", "WAKING THE CROPS...", "ALMOST READY!"];
@@ -233,7 +351,7 @@
     if (p >= 100) {
       clearInterval(timer);
       setTimeout(() => {
-        document.getElementById("home").style.display = "flex";
+        document.getElementById("app").style.display = "flex";
         document.getElementById("loading").classList.add("hide");
       }, 300);
     }
