@@ -12,6 +12,7 @@
     font-family: sans-serif; color: #fff; user-select: none;
     background: linear-gradient(#4fc3f7 0%, #81d4fa 30%, #8bc34a 65%, #33691e 100%);
   }
+  .ic { width: 1em; height: 1em; display: inline-block; vertical-align: middle; }
 
   /* ---------- LOADING ---------- */
   #loading {
@@ -27,8 +28,8 @@
     display: flex; align-items: center; justify-content: center;
     box-shadow: 0 0 60px 20px rgba(255,235,59,.5);
   }
-  .icon { font-size: 100px; animation: sway 2s ease-in-out infinite; }
-  @keyframes sway { 0%,100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
+  .icon { font-size: 150px; line-height: 1; animation: sway 2s ease-in-out infinite; }
+  @keyframes sway { 0%,100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
   .title {
     margin-top: 24px; font-size: 38px; font-weight: 900; letter-spacing: 2px; color: #fff176;
     text-shadow: 0 3px 0 #33691e, 0 6px 10px rgba(0,0,0,.4);
@@ -41,7 +42,7 @@
     background: repeating-linear-gradient(45deg, #76ff03 0 12px, #c6ff00 12px 24px);
     transition: width .2s linear;
   }
-  .seed { position: absolute; top: -8px; left: 0%; font-size: 28px; transition: left .2s linear; transform: translateX(-50%); }
+  .seed { position: absolute; top: -14px; left: 0%; font-size: 36px; line-height: 1; transition: left .2s linear; transform: translateX(-50%); }
   .msg { margin-top: 28px; font-size: 15px; font-weight: bold; letter-spacing: 2px; text-shadow: 0 1px 4px rgba(0,0,0,.5); }
   .cloud { position: absolute; top: 6vh; font-size: 40px; opacity: .85; animation: drift 14s linear infinite; }
   .cloud.c2 { top: 16vh; font-size: 30px; animation-duration: 20s; animation-delay: -8s; }
@@ -64,7 +65,7 @@
     text-shadow: 0 3px 0 #33691e, 0 6px 10px rgba(0,0,0,.35);
   }
   .banner .sub { margin-top: 6px; font-size: 14px; letter-spacing: 2px; opacity: .95; }
-  .hero { font-size: 70px; margin-top: 4px; animation: sway 2.5s ease-in-out infinite; display: inline-block; }
+  .hero { font-size: 90px; line-height: 1; animation: sway 2.5s ease-in-out infinite; display: inline-block; }
   .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 6px 14px; }
   .card {
     position: relative; border-radius: 20px; padding: 18px 10px; text-align: center;
@@ -72,7 +73,7 @@
     box-shadow: 0 6px 14px rgba(0,0,0,.18); backdrop-filter: blur(6px); transition: transform .1s;
   }
   .card:active { transform: scale(.96); }
-  .card .em { font-size: 44px; display: block; }
+  .card .em { font-size: 44px; line-height: 1.1; display: block; }
   .card .t { margin-top: 8px; font-weight: 800; font-size: 16px; letter-spacing: 1px; }
   .card .d { margin-top: 2px; font-size: 11px; opacity: .85; }
   .badge {
@@ -90,15 +91,16 @@
     background: rgba(0,0,0,.25); border: 2px solid transparent;
   }
   .crop.sel { border-color: #fff176; background: rgba(0,0,0,.4); }
-  .crop .em { font-size: 28px; display: block; }
+  .crop .em { font-size: 46px; line-height: 1.1; display: block; }
   .crop small { font-weight: normal; opacity: .9; }
   .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 14px; }
   .plot {
     aspect-ratio: 1; border-radius: 16px; background: #8b5a2b; border: 3px solid #6d4320;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    font-size: 34px; color: #fff;
+    font-size: 52px; color: #fff; line-height: 1;
   }
-  .plot small { font-size: 12px; margin-top: 2px; font-weight: bold; }
+  .plot small { font-size: 12px; margin-top: 4px; font-weight: bold; }
+  .plot .plus { font-size: 34px; }
   .plot.ready { background: #43a047; border-color: #2e7d32; animation: pulse 1s infinite; }
   @keyframes pulse { 50% { transform: scale(.95); } }
   .btn {
@@ -134,16 +136,69 @@
 </head>
 <body>
 
+<!-- ILLUSTRATIONS (drawn in code) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff59d"/><stop offset="1" stop-color="#f9a825"/>
+    </linearGradient>
+    <radialGradient id="red" cx=".35" cy=".3" r=".8">
+      <stop offset="0" stop-color="#ff8a65"/><stop offset=".55" stop-color="#e53935"/><stop offset="1" stop-color="#a31515"/>
+    </radialGradient>
+    <pattern id="kern" width="9" height="9" patternUnits="userSpaceOnUse">
+      <rect width="9" height="9" fill="#fbc02d"/>
+      <circle cx="4.5" cy="4.5" r="3.4" fill="#ffee58" stroke="#f57f17" stroke-width=".7"/>
+    </pattern>
+
+    <g id="rice">
+      <path d="M48 98 C48 75 52 55 64 22" stroke="#6b8e23" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M48 92 C30 82 20 64 12 50 C30 58 44 72 48 92Z" fill="#7cb342"/>
+      <path d="M50 84 C68 78 78 62 88 50 C68 52 52 64 50 84Z" fill="#689f38"/>
+      <g fill="url(#gold)" stroke="#e6a100" stroke-width=".6">
+        <ellipse cx="64" cy="14" rx="4" ry="8"/>
+        <ellipse cx="57" cy="24" rx="4" ry="8" transform="rotate(-30 57 24)"/>
+        <ellipse cx="70" cy="26" rx="4" ry="8" transform="rotate(30 70 26)"/>
+        <ellipse cx="53" cy="36" rx="4" ry="8" transform="rotate(-32 53 36)"/>
+        <ellipse cx="66" cy="38" rx="4" ry="8" transform="rotate(32 66 38)"/>
+        <ellipse cx="49" cy="48" rx="4" ry="8" transform="rotate(-34 49 48)"/>
+        <ellipse cx="62" cy="50" rx="4" ry="8" transform="rotate(34 62 50)"/>
+      </g>
+    </g>
+
+    <g id="tomato">
+      <circle cx="50" cy="58" r="34" fill="url(#red)"/>
+      <ellipse cx="37" cy="44" rx="9" ry="5" fill="#fff" opacity=".4" transform="rotate(-35 37 44)"/>
+      <path d="M50 28 L57 37 L68 32 L61 41 L70 47 L58 45 L50 54 L42 45 L30 47 L39 41 L32 32 L43 37Z" fill="#43a047"/>
+      <rect x="48" y="16" width="5" height="14" rx="2" fill="#2e7d32"/>
+    </g>
+
+    <g id="corn">
+      <path d="M50 98 C18 90 20 50 40 38 C40 62 46 80 50 98Z" fill="#66bb6a"/>
+      <path d="M50 98 C82 90 80 50 60 38 C60 62 54 80 50 98Z" fill="#43a047"/>
+      <ellipse cx="50" cy="48" rx="17" ry="34" fill="url(#kern)" stroke="#f57f17" stroke-width="1.5"/>
+      <path d="M50 16 C46 8 48 4 52 2" stroke="#8d6e63" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M40 60 C44 80 48 90 50 98 C52 90 56 80 60 60 C54 70 46 70 40 60Z" fill="#81c784"/>
+    </g>
+
+    <g id="sprout">
+      <ellipse cx="50" cy="88" rx="26" ry="9" fill="#6d4320"/>
+      <path d="M50 86 C50 72 50 64 50 56" stroke="#558b2f" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M50 58 C28 58 16 42 18 28 C36 30 50 42 50 58Z" fill="#7cb342"/>
+      <path d="M50 62 C72 62 84 46 82 32 C64 34 50 46 50 62Z" fill="#9ccc65"/>
+    </g>
+  </defs>
+</svg>
+
 <!-- LOADING -->
 <div id="loading">
   <div class="cloud">☁️</div>
   <div class="cloud c2">☁️</div>
-  <div class="sun-wrap"><div class="icon">🌾</div></div>
+  <div class="sun-wrap"><div class="icon"><svg class="ic" viewBox="0 0 100 100"><use href="#rice"/></svg></div></div>
   <div class="title">FARMING ALIVE</div>
   <div class="tag">GROW · HARVEST · EARN</div>
   <div class="bar-wrap">
     <div class="bar"><div class="fill" id="fill"></div></div>
-    <div class="seed" id="seed">🌱</div>
+    <div class="seed" id="seed"><svg class="ic" viewBox="0 0 100 100"><use href="#sprout"/></svg></div>
   </div>
   <div class="msg" id="msg">PREPARING THE FIELD...</div>
 </div>
@@ -151,20 +206,20 @@
 <!-- APP -->
 <div id="app">
   <div class="topbar">
-    <div class="pill">👤 <span id="uname">Farmer</span></div>
+    <div class="pill"><svg class="ic" viewBox="0 0 100 100" style="font-size:22px"><use href="#rice"/></svg> <span id="uname">Farmer</span></div>
     <div class="pill">🪙 <span id="coins">0</span></div>
   </div>
 
   <!-- HOME PAGE -->
   <div class="page on" id="p-home">
     <div class="banner">
-      <div class="hero">🌾</div>
+      <div class="hero"><svg class="ic" viewBox="0 0 100 100"><use href="#rice"/></svg></div>
       <div class="big">FARMING ALIVE</div>
       <div class="sub">WHAT WILL YOU GROW TODAY?</div>
     </div>
     <div class="cards">
       <div class="card" onclick="go('farm')">
-        <span class="em">🌱</span><div class="t">FARM</div><div class="d">Plant &amp; harvest crops</div>
+        <span class="em"><svg class="ic" viewBox="0 0 100 100"><use href="#sprout"/></svg></span><div class="t">FARM</div><div class="d">Plant &amp; harvest crops</div>
       </div>
       <div class="card" onclick="go('shop')">
         <span class="em">🛒</span><div class="t">SHOP</div><div class="d">Buy seeds, sell crops</div>
@@ -201,7 +256,7 @@
 
   <div class="nav">
     <div id="n-home" class="on" onclick="go('home')"><span>🏠</span>HOME</div>
-    <div id="n-farm" onclick="go('farm')"><span>🌱</span>FARM</div>
+    <div id="n-farm" onclick="go('farm')"><span><svg class="ic" viewBox="0 0 100 100"><use href="#sprout"/></svg></span>FARM</div>
     <div id="n-shop" onclick="go('shop')"><span>🛒</span>SHOP</div>
     <div id="n-profile" onclick="go('profile')"><span>👤</span>PROFILE</div>
   </div>
@@ -215,11 +270,15 @@
   tg.expand();
   try { tg.setHeaderColor("#4fc3f7"); tg.setBackgroundColor("#4fc3f7"); } catch (e) {}
 
+  function ic(name) {
+    return '<svg class="ic" viewBox="0 0 100 100"><use href="#' + name + '"/></svg>';
+  }
+
   /* ---------- DATA ---------- */
   const CROPS = {
-    rice:   { n: "Rice",   e: "🌾", cost: 5,  time: 10, sell: 12 },
-    tomato: { n: "Tomato", e: "🍅", cost: 20, time: 30, sell: 55 },
-    corn:   { n: "Corn",   e: "🌽", cost: 50, time: 60, sell: 140 }
+    rice:   { n: "Rice",   cost: 5,  time: 10, sell: 12 },
+    tomato: { n: "Tomato", cost: 20, time: 30, sell: 55 },
+    corn:   { n: "Corn",   cost: 50, time: 60, sell: 140 }
   };
   const KEY = "farming_alive_full_v1";
   const MAX_PLOTS = 12;
@@ -262,7 +321,6 @@
 
   /* ---------- FARM ---------- */
   function plotCost() { return 100 * (state.plots.length - 3); }
-
   function selectCrop(k) { selected = k; render(); }
 
   function tapPlot(i) {
@@ -299,7 +357,6 @@
   function render() {
     document.getElementById("coins").innerText = state.coins;
 
-    // bonus card
     const done = state.lastBonus === today();
     const badge = document.getElementById("bonusBadge");
     document.getElementById("bonusDesc").innerText = done ? "Come back tomorrow" : "Free coins every day";
@@ -307,22 +364,21 @@
     badge.className = "badge" + (done ? " ok" : "");
     document.getElementById("bonusCard").classList.toggle("dim", done);
 
-    // farm page
     if (!document.getElementById("p-farm").classList.contains("on")) return;
 
     document.getElementById("crops").innerHTML = Object.keys(CROPS).map(k => {
       const c = CROPS[k];
       return '<div class="crop ' + (k === selected ? "sel" : "") + '" onclick="selectCrop(\'' + k + '\')">' +
-        '<span class="em">' + c.e + '</span>' + c.n +
+        '<span class="em">' + ic(k) + '</span>' + c.n +
         '<br><small>🪙' + c.cost + ' → ' + c.sell + '</small><br><small>⏱ ' + c.time + 's</small></div>';
     }).join("");
 
     document.getElementById("grid").innerHTML = state.plots.map((p, i) => {
-      if (!p) return '<div class="plot" onclick="tapPlot(' + i + ')">➕</div>';
+      if (!p) return '<div class="plot" onclick="tapPlot(' + i + ')"><span class="plus">➕</span></div>';
       const c = CROPS[p.c];
       const left = Math.ceil(c.time - (Date.now() - p.t) / 1000);
-      if (left <= 0) return '<div class="plot ready" onclick="tapPlot(' + i + ')">' + c.e + '<small>HARVEST!</small></div>';
-      return '<div class="plot" onclick="tapPlot(' + i + ')">🌱<small>' + left + 's</small></div>';
+      if (left <= 0) return '<div class="plot ready" onclick="tapPlot(' + i + ')">' + ic(p.c) + '<small>HARVEST!</small></div>';
+      return '<div class="plot" onclick="tapPlot(' + i + ')">' + ic("sprout") + '<small>' + left + 's</small></div>';
     }).join("");
 
     const b = document.getElementById("buyPlot");
@@ -358,4 +414,4 @@
   }, 50);
 </script>
 </body>
-</html>
+   </html>
