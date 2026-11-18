@@ -6,81 +6,114 @@
 <title>Farming Alive</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; overflow: hidden; }
   body {
-    font-family: sans-serif;
-    color: #fff;
+    font-family: sans-serif; color: #fff; user-select: none;
     background: linear-gradient(#4fc3f7 0%, #81d4fa 30%, #8bc34a 65%, #33691e 100%);
   }
+
+  /* ---------- LOADING ---------- */
   #loading {
-    position: fixed; inset: 0;
+    position: fixed; inset: 0; z-index: 10;
     display: flex; flex-direction: column; align-items: center;
-    padding-top: 10vh;
-    transition: opacity .5s;
+    padding-top: 10vh; transition: opacity .5s;
+    background: linear-gradient(#4fc3f7 0%, #81d4fa 30%, #8bc34a 65%, #33691e 100%);
   }
   #loading.hide { opacity: 0; pointer-events: none; }
-
   .sun-wrap {
     width: 220px; height: 220px; border-radius: 50%;
     background: radial-gradient(circle, #fff9c4 0%, #ffe082 60%, rgba(255,224,130,.3) 100%);
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 0 60px 20px rgba(255, 235, 59, .5);
+    box-shadow: 0 0 60px 20px rgba(255,235,59,.5);
   }
   .icon { font-size: 100px; animation: sway 2s ease-in-out infinite; }
-  @keyframes sway {
-    0%, 100% { transform: rotate(-8deg); }
-    50% { transform: rotate(8deg); }
-  }
-
+  @keyframes sway { 0%,100% { transform: rotate(-8deg); } 50% { transform: rotate(8deg); } }
   .title {
-    margin-top: 24px; font-size: 38px; font-weight: 900; letter-spacing: 2px;
-    color: #fff176;
+    margin-top: 24px; font-size: 38px; font-weight: 900; letter-spacing: 2px; color: #fff176;
     text-shadow: 0 3px 0 #33691e, 0 6px 10px rgba(0,0,0,.4);
   }
   .tag { margin-top: 8px; font-size: 15px; letter-spacing: 3px; opacity: .95; }
-
   .bar-wrap { width: 70%; max-width: 320px; margin-top: 40px; position: relative; }
-  .bar {
-    height: 16px; border-radius: 10px; background: rgba(0,0,0,.25);
-    overflow: hidden;
-  }
+  .bar { height: 16px; border-radius: 10px; background: rgba(0,0,0,.25); overflow: hidden; }
   .fill {
     height: 100%; width: 0%; border-radius: 10px;
     background: repeating-linear-gradient(45deg, #76ff03 0 12px, #c6ff00 12px 24px);
     transition: width .2s linear;
   }
-  .seed {
-    position: absolute; top: -8px; left: 0%;
-    font-size: 28px; transition: left .2s linear;
-    transform: translateX(-50%);
-  }
-  .msg {
-    margin-top: 28px; font-size: 15px; font-weight: bold; letter-spacing: 2px;
-    text-shadow: 0 1px 4px rgba(0,0,0,.5);
-  }
-
+  .seed { position: absolute; top: -8px; left: 0%; font-size: 28px; transition: left .2s linear; transform: translateX(-50%); }
+  .msg { margin-top: 28px; font-size: 15px; font-weight: bold; letter-spacing: 2px; text-shadow: 0 1px 4px rgba(0,0,0,.5); }
   .cloud { position: absolute; top: 6vh; font-size: 40px; opacity: .85; animation: drift 14s linear infinite; }
   .cloud.c2 { top: 16vh; font-size: 30px; animation-duration: 20s; animation-delay: -8s; }
   @keyframes drift { from { left: -15%; } to { left: 105%; } }
 
-  #home {
-    position: fixed; inset: 0; display: none;
-    align-items: center; justify-content: center; flex-direction: column;
-    font-size: 22px; font-weight: bold; letter-spacing: 2px;
+  /* ---------- HOME ---------- */
+  #home { position: fixed; inset: 0; display: none; flex-direction: column; }
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 14px;
   }
+  .pill {
+    background: rgba(0,0,0,.28); border-radius: 22px; padding: 8px 14px;
+    font-weight: bold; font-size: 15px; backdrop-filter: blur(4px);
+  }
+  .banner { text-align: center; padding: 8px 16px 14px; }
+  .banner .big {
+    font-size: 34px; font-weight: 900; letter-spacing: 2px; color: #fff176;
+    text-shadow: 0 3px 0 #33691e, 0 6px 10px rgba(0,0,0,.35);
+  }
+  .banner .sub { margin-top: 6px; font-size: 14px; letter-spacing: 2px; opacity: .95; }
+  .hero { font-size: 70px; margin-top: 4px; animation: sway 2.5s ease-in-out infinite; display: inline-block; }
+
+  .cards {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    padding: 6px 14px; flex: 1; align-content: start;
+  }
+  .card {
+    position: relative; border-radius: 20px; padding: 18px 10px; text-align: center;
+    background: rgba(255,255,255,.2); border: 2px solid rgba(255,255,255,.35);
+    box-shadow: 0 6px 14px rgba(0,0,0,.18); backdrop-filter: blur(6px);
+    transition: transform .1s;
+  }
+  .card:active { transform: scale(.96); }
+  .card .em { font-size: 44px; display: block; }
+  .card .t { margin-top: 8px; font-weight: 800; font-size: 16px; letter-spacing: 1px; }
+  .card .d { margin-top: 2px; font-size: 11px; opacity: .85; }
+  .badge {
+    position: absolute; top: 8px; right: 8px; background: #ff7043; color: #fff;
+    font-size: 10px; font-weight: bold; padding: 3px 7px; border-radius: 10px;
+  }
+  .badge.ok { background: #66bb6a; }
+  .card.dim { opacity: .75; }
+
+  .nav {
+    display: flex; justify-content: space-around;
+    padding: 10px 6px calc(10px + env(safe-area-inset-bottom));
+    background: rgba(20,45,10,.75); backdrop-filter: blur(8px);
+    border-top: 1px solid rgba(255,255,255,.2);
+  }
+  .nav div { text-align: center; font-size: 11px; letter-spacing: 1px; opacity: .7; min-width: 60px; }
+  .nav div span { display: block; font-size: 24px; margin-bottom: 2px; }
+  .nav div.on { opacity: 1; font-weight: bold; }
+
+  #toast {
+    position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,.85); color: #fff; padding: 10px 18px; z-index: 20;
+    border-radius: 20px; font-size: 14px; opacity: 0; transition: opacity .3s;
+    pointer-events: none; white-space: nowrap;
+  }
+  #toast.show { opacity: 1; }
 </style>
 </head>
 <body>
 
+<!-- LOADING -->
 <div id="loading">
   <div class="cloud">☁️</div>
   <div class="cloud c2">☁️</div>
-
   <div class="sun-wrap"><div class="icon">🌾</div></div>
   <div class="title">FARMING ALIVE</div>
   <div class="tag">GROW · HARVEST · EARN</div>
-
   <div class="bar-wrap">
     <div class="bar"><div class="fill" id="fill"></div></div>
     <div class="seed" id="seed">🌱</div>
@@ -88,10 +121,45 @@
   <div class="msg" id="msg">PREPARING THE FIELD...</div>
 </div>
 
+<!-- HOME -->
 <div id="home">
-  <div>🏠 HOME PAGE</div>
-  <div style="font-size:14px;margin-top:8px;opacity:.8;font-weight:normal">(coming next)</div>
+  <div class="topbar">
+    <div class="pill">👤 <span id="uname">Farmer</span></div>
+    <div class="pill">🪙 <span id="coins">0</span></div>
+  </div>
+
+  <div class="banner">
+    <div class="hero">🌾</div>
+    <div class="big">FARMING ALIVE</div>
+    <div class="sub">WHAT WILL YOU GROW TODAY?</div>
+  </div>
+
+  <div class="cards">
+    <div class="card" onclick="soon('Farm')">
+      <span class="em">🌱</span><div class="t">FARM</div><div class="d">Plant &amp; harvest crops</div>
+    </div>
+    <div class="card" onclick="soon('Shop')">
+      <span class="em">🛒</span><div class="t">SHOP</div><div class="d">Buy seeds, sell crops</div>
+    </div>
+    <div class="card" id="bonusCard" onclick="claimBonus()">
+      <span class="badge" id="bonusBadge">+50</span>
+      <span class="em">🎁</span><div class="t">DAILY BONUS</div><div class="d" id="bonusDesc">Free coins every day</div>
+    </div>
+    <div class="card dim" onclick="toast('🏆 Leaderboard is coming soon!')">
+      <span class="badge">SOON</span>
+      <span class="em">🏆</span><div class="t">LEADERBOARD</div><div class="d">Top farmers</div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <div class="on"><span>🏠</span>HOME</div>
+    <div onclick="soon('Farm')"><span>🌱</span>FARM</div>
+    <div onclick="soon('Shop')"><span>🛒</span>SHOP</div>
+    <div onclick="soon('Profile')"><span>👤</span>PROFILE</div>
+  </div>
 </div>
+
+<div id="toast"></div>
 
 <script>
   const tg = window.Telegram.WebApp;
@@ -102,12 +170,55 @@
     tg.setBackgroundColor("#4fc3f7");
   } catch (e) {}
 
-  const msgs = [
-    "PREPARING THE FIELD...",
-    "PLANTING SEEDS...",
-    "WAKING THE CROPS...",
-    "ALMOST READY!"
-  ];
+  /* ---------- SAVE DATA ---------- */
+  const KEY = "farming_alive_home_v1";
+  let state = { coins: 30, lastBonus: "" };
+  try {
+    const s = JSON.parse(localStorage.getItem(KEY));
+    if (s && typeof s.coins === "number") state = s;
+  } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+
+  /* ---------- HELPERS ---------- */
+  function toast(m) {
+    const t = document.getElementById("toast");
+    t.innerText = m; t.classList.add("show");
+    clearTimeout(toast.id);
+    toast.id = setTimeout(() => t.classList.remove("show"), 1800);
+  }
+  function haptic() { try { tg.HapticFeedback.impactOccurred("light"); } catch (e) {} }
+  function soon(name) { haptic(); toast("🚧 " + name + " page is coming next!"); }
+  function today() { return new Date().toISOString().slice(0, 10); }
+
+  /* ---------- DAILY BONUS ---------- */
+  function renderBonus() {
+    const done = state.lastBonus === today();
+    const badge = document.getElementById("bonusBadge");
+    document.getElementById("bonusDesc").innerText = done ? "Come back tomorrow" : "Free coins every day";
+    badge.innerText = done ? "CLAIMED" : "+50";
+    badge.className = "badge" + (done ? " ok" : "");
+    document.getElementById("bonusCard").classList.toggle("dim", done);
+  }
+  function claimBonus() {
+    if (state.lastBonus === today()) { toast("Already claimed today ✅"); return; }
+    state.coins += 50;
+    state.lastBonus = today();
+    save(); haptic();
+    toast("🎁 +50 coins!");
+    render();
+  }
+
+  function render() {
+    document.getElementById("coins").innerText = state.coins;
+    renderBonus();
+  }
+
+  const user = tg.initDataUnsafe && tg.initDataUnsafe.user;
+  if (user) document.getElementById("uname").innerText = user.first_name;
+  render();
+
+  /* ---------- LOADING ANIMATION ---------- */
+  const msgs = ["PREPARING THE FIELD...", "PLANTING SEEDS...", "WAKING THE CROPS...", "ALMOST READY!"];
   const TOTAL = 2500;
   const start = Date.now();
   const fill = document.getElementById("fill");
@@ -122,8 +233,8 @@
     if (p >= 100) {
       clearInterval(timer);
       setTimeout(() => {
-        document.getElementById("loading").classList.add("hide");
         document.getElementById("home").style.display = "flex";
+        document.getElementById("loading").classList.add("hide");
       }, 300);
     }
   }, 50);
