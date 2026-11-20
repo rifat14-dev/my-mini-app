@@ -8,18 +8,14 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; overflow: hidden; }
-  body {
-    font-family: sans-serif; color: #fff; user-select: none;
-    background: #5d4037;
-  }
+  body { font-family: sans-serif; color: #fff; user-select: none; background: #5d4037; }
   .ic { width: 1em; height: 1em; display: inline-block; vertical-align: middle; }
 
   /* ---------- LOADING ---------- */
   #loading {
     position: fixed; inset: 0; z-index: 10;
     display: flex; flex-direction: column; align-items: center;
-    padding-top: 10vh; transition: opacity .5s;
-    background: #5d4037;
+    padding-top: 10vh; transition: opacity .5s; background: #5d4037;
   }
   #loading.hide { opacity: 0; pointer-events: none; }
   .sun-wrap {
@@ -109,6 +105,28 @@
     background: #ef6c00; box-shadow: 0 4px 0 #bf360c;
   }
   .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #bf360c; }
+  .btn.off { background: #78909c; box-shadow: 0 4px 0 #455a64; }
+
+  /* ---------- DAILY ---------- */
+  .dhead { text-align: center; padding: 6px 14px 12px; }
+  .dhead .dt {
+    font-size: 28px; font-weight: 900; letter-spacing: 2px; color: #fff176;
+    text-shadow: 0 3px 0 #33691e, 0 6px 10px rgba(0,0,0,.35);
+  }
+  .dhead .ds { margin-top: 6px; font-size: 13px; opacity: .95; letter-spacing: 1px; }
+  .days { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 14px; }
+  .day {
+    position: relative; border-radius: 16px; padding: 10px 4px; text-align: center;
+    background: rgba(0,0,0,.28); border: 2px solid rgba(255,255,255,.25);
+  }
+  .day .dn { font-size: 11px; font-weight: bold; letter-spacing: 1px; opacity: .9; }
+  .day .dg { font-size: 34px; line-height: 1.2; }
+  .day .dr { font-size: 14px; font-weight: 800; }
+  .day.done { background: rgba(67,160,71,.55); border-color: #a5d6a7; }
+  .day.today { border-color: #fff176; background: rgba(255,193,7,.35); animation: pulse 1s infinite; }
+  .day.big { grid-column: span 3; display: flex; align-items: center; justify-content: center; gap: 14px; }
+  .day.big .dg { font-size: 42px; }
+  .tick { position: absolute; top: 4px; right: 6px; font-size: 14px; }
 
   /* ---------- SOON PAGE ---------- */
   .soonbox { text-align: center; padding: 60px 20px; font-size: 20px; font-weight: bold; letter-spacing: 2px; }
@@ -117,12 +135,12 @@
   /* ---------- NAV ---------- */
   .nav {
     display: flex; justify-content: space-around;
-    padding: 10px 6px calc(10px + env(safe-area-inset-bottom));
+    padding: 8px 2px calc(8px + env(safe-area-inset-bottom));
     background: rgba(20,45,10,.8); backdrop-filter: blur(8px);
     border-top: 1px solid rgba(255,255,255,.2);
   }
-  .nav div { text-align: center; font-size: 11px; letter-spacing: 1px; opacity: .65; min-width: 60px; }
-  .nav div span { display: block; font-size: 24px; margin-bottom: 2px; }
+  .nav div { flex: 1; text-align: center; font-size: 9px; letter-spacing: .5px; opacity: .65; }
+  .nav div span { display: block; font-size: 22px; margin-bottom: 2px; line-height: 1.1; }
   .nav div.on { opacity: 1; font-weight: bold; }
 
   #toast {
@@ -224,13 +242,13 @@
       <div class="card" onclick="go('shop')">
         <span class="em">🛒</span><div class="t">SHOP</div><div class="d">Buy seeds, sell crops</div>
       </div>
-      <div class="card" id="bonusCard" onclick="claimBonus()">
-        <span class="badge" id="bonusBadge">+50</span>
-        <span class="em">🎁</span><div class="t">DAILY BONUS</div><div class="d" id="bonusDesc">Free coins every day</div>
+      <div class="card" id="bonusCard" onclick="go('daily')">
+        <span class="badge" id="bonusBadge">+100</span>
+        <span class="em">🎁</span><div class="t">DAILY BONUS</div><div class="d" id="bonusDesc">Login every day</div>
       </div>
-      <div class="card dim" onclick="toast('🏆 Leaderboard is coming soon!')">
+      <div class="card dim" onclick="go('ranking')">
         <span class="badge">SOON</span>
-        <span class="em">🏆</span><div class="t">LEADERBOARD</div><div class="d">Top farmers</div>
+        <span class="em">🏆</span><div class="t">RANKING</div><div class="d">Top farmers</div>
       </div>
     </div>
   </div>
@@ -249,6 +267,21 @@
     <div class="soonbox">🛒 SHOP<div>Coming next</div></div>
   </div>
 
+  <!-- DAILY PAGE -->
+  <div class="page" id="p-daily">
+    <div class="dhead">
+      <div class="dt">🎁 DAILY BONUS</div>
+      <div class="ds" id="dStatus"></div>
+    </div>
+    <div class="days" id="days"></div>
+    <button class="btn" id="claimBtn"></button>
+  </div>
+
+  <!-- RANKING PAGE -->
+  <div class="page" id="p-ranking">
+    <div class="soonbox">🏆 RANKING<div>Coming soon</div></div>
+  </div>
+
   <!-- PROFILE PAGE -->
   <div class="page" id="p-profile">
     <div class="soonbox">👤 PROFILE<div>Coming next</div></div>
@@ -258,6 +291,8 @@
     <div id="n-home" class="on" onclick="go('home')"><span>🏠</span>HOME</div>
     <div id="n-farm" onclick="go('farm')"><span><svg class="ic" viewBox="0 0 100 100"><use href="#sprout"/></svg></span>FARM</div>
     <div id="n-shop" onclick="go('shop')"><span>🛒</span>SHOP</div>
+    <div id="n-daily" onclick="go('daily')"><span>🎁</span>DAILY</div>
+    <div id="n-ranking" onclick="go('ranking')"><span>🏆</span>RANKING</div>
     <div id="n-profile" onclick="go('profile')"><span>👤</span>PROFILE</div>
   </div>
 </div>
@@ -282,11 +317,13 @@
   };
   const KEY = "farming_alive_full_v1";
   const MAX_PLOTS = 12;
-  let state = { coins: 30, lastBonus: "", plots: [null, null, null, null] };
+  let state = { coins: 30, lastBonus: "", streak: 0, plots: [null, null, null, null] };
   try {
     const s = JSON.parse(localStorage.getItem(KEY));
     if (s && typeof s.coins === "number" && s.plots) state = s;
   } catch (e) {}
+  if (typeof state.streak !== "number") state.streak = 0;
+  if (!state.lastBonus) state.lastBonus = "";
   let selected = "rice";
 
   function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
@@ -294,14 +331,19 @@
     const t = document.getElementById("toast");
     t.innerText = m; t.classList.add("show");
     clearTimeout(toast.id);
-    toast.id = setTimeout(() => t.classList.remove("show"), 1500);
+    toast.id = setTimeout(() => t.classList.remove("show"), 1800);
   }
   function haptic() { try { tg.HapticFeedback.impactOccurred("light"); } catch (e) {} }
-  function today() { return new Date().toISOString().slice(0, 10); }
+  function dstr(d) {
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+  function today() { return dstr(new Date()); }
+  function yesterday() { const d = new Date(); d.setDate(d.getDate() - 1); return dstr(d); }
 
   /* ---------- NAVIGATION ---------- */
+  const PAGES = ["home", "farm", "shop", "daily", "ranking", "profile"];
   function go(name) {
-    ["home", "farm", "shop", "profile"].forEach(p => {
+    PAGES.forEach(p => {
       document.getElementById("p-" + p).classList.toggle("on", p === name);
       document.getElementById("n-" + p).classList.toggle("on", p === name);
     });
@@ -310,14 +352,30 @@
   }
 
   /* ---------- DAILY BONUS ---------- */
+  const DAY_REWARD = [100, 200, 300, 400, 500, 600, 700];
+
+  function claimedToday() { return state.lastBonus === today(); }
+
+  // how many days of the current chain are completed (0..7)
+  function chain() {
+    if (!state.lastBonus) return 0;
+    if (state.lastBonus === today()) return state.streak;
+    if (state.lastBonus === yesterday()) return state.streak >= 7 ? 0 : state.streak;
+    return 0; // missed a day -> restart
+  }
+
   function claimBonus() {
-    if (state.lastBonus === today()) { toast("Already claimed today ✅"); return; }
-    state.coins += 50;
+    if (claimedToday()) { toast("Already claimed today ✅"); return; }
+    const day = chain() + 1;
+    const reward = DAY_REWARD[day - 1];
+    state.coins += reward;
+    state.streak = day;
     state.lastBonus = today();
     save(); haptic();
-    toast("🎁 +50 coins!");
+    toast("🎁 Day " + day + ": +" + reward + " coins!");
     render();
   }
+  document.getElementById("claimBtn").onclick = claimBonus;
 
   /* ---------- FARM ---------- */
   function plotCost() { return 100 * (state.plots.length - 3); }
@@ -354,17 +412,46 @@
   document.getElementById("buyPlot").onclick = buyPlot;
 
   /* ---------- RENDER ---------- */
+  function isOn(p) { return document.getElementById("p-" + p).classList.contains("on"); }
+
   function render() {
     document.getElementById("coins").innerText = state.coins;
 
-    const done = state.lastBonus === today();
+    const done = claimedToday();
+    const cur = chain();
+    const nextDay = Math.min(7, cur + 1);
+
+    // home bonus card
     const badge = document.getElementById("bonusBadge");
-    document.getElementById("bonusDesc").innerText = done ? "Come back tomorrow" : "Free coins every day";
-    badge.innerText = done ? "CLAIMED" : "+50";
+    document.getElementById("bonusDesc").innerText = done ? "Come back tomorrow" : "Day " + nextDay + " reward ready";
+    badge.innerText = done ? "CLAIMED" : "+" + DAY_REWARD[nextDay - 1];
     badge.className = "badge" + (done ? " ok" : "");
     document.getElementById("bonusCard").classList.toggle("dim", done);
 
-    if (!document.getElementById("p-farm").classList.contains("on")) return;
+    // daily page
+    if (isOn("daily")) {
+      document.getElementById("dStatus").innerText = done
+        ? "Claimed! Come back tomorrow for Day " + (state.streak >= 7 ? 1 : state.streak + 1)
+        : "Login every day. Miss a day and it restarts from Day 1.";
+      document.getElementById("days").innerHTML = DAY_REWARD.map((r, i) => {
+        const d = i + 1;
+        let cls = "day";
+        if (d <= cur) cls += " done";
+        else if (!done && d === cur + 1) cls += " today";
+        if (d === 7) cls += " big";
+        const tick = d <= cur ? '<span class="tick">✅</span>' : "";
+        if (d === 7) {
+          return '<div class="' + cls + '">' + tick + '<div class="dg">🎁</div><div><div class="dn">DAY 7</div><div class="dr">🪙 ' + r + '</div></div></div>';
+        }
+        return '<div class="' + cls + '">' + tick + '<div class="dn">DAY ' + d + '</div><div class="dg">🎁</div><div class="dr">🪙 ' + r + '</div></div>';
+      }).join("");
+      const b = document.getElementById("claimBtn");
+      if (done) { b.innerText = "✅ CLAIMED TODAY"; b.classList.add("off"); }
+      else { b.innerText = "🎁 CLAIM DAY " + nextDay + " (+" + DAY_REWARD[nextDay - 1] + ")"; b.classList.remove("off"); }
+    }
+
+    // farm page
+    if (!isOn("farm")) return;
 
     document.getElementById("crops").innerHTML = Object.keys(CROPS).map(k => {
       const c = CROPS[k];
@@ -381,9 +468,9 @@
       return '<div class="plot" onclick="tapPlot(' + i + ')">' + ic("sprout") + '<small>' + left + 's</small></div>';
     }).join("");
 
-    const b = document.getElementById("buyPlot");
-    if (state.plots.length >= MAX_PLOTS) b.style.display = "none";
-    else { b.style.display = "block"; b.innerText = "➕ BUY NEW FIELD (🪙 " + plotCost() + ")"; }
+    const bp = document.getElementById("buyPlot");
+    if (state.plots.length >= MAX_PLOTS) bp.style.display = "none";
+    else { bp.style.display = "block"; bp.innerText = "➕ BUY NEW FIELD (🪙 " + plotCost() + ")"; }
   }
 
   const user = tg.initDataUnsafe && tg.initDataUnsafe.user;
@@ -414,4 +501,4 @@
   }, 50);
 </script>
 </body>
- </html>
+       </html>
