@@ -89,6 +89,7 @@
   .crop.sel { border-color: #fff176; background: rgba(0,0,0,.4); }
   .crop .em { font-size: 46px; line-height: 1.1; display: block; }
   .crop small { font-weight: normal; opacity: .9; }
+  .crop small .ic { font-size: 13px; }
   .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 0 14px; }
   .plot {
     aspect-ratio: 1; border-radius: 16px; background: #8b5a2b; border: 3px solid #6d4320;
@@ -106,6 +107,7 @@
   }
   .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #bf360c; }
   .btn.off { background: #78909c; box-shadow: 0 4px 0 #455a64; }
+  .btn .ic { font-size: 16px; }
 
   /* ---------- DAILY ---------- */
   .dhead { text-align: center; padding: 6px 14px 12px; }
@@ -122,6 +124,7 @@
   .day .dn { font-size: 11px; font-weight: bold; letter-spacing: 1px; opacity: .9; }
   .day .dg { font-size: 34px; line-height: 1.2; }
   .day .dr { font-size: 14px; font-weight: 800; }
+  .day .dr .ic { font-size: 16px; }
   .day.done { background: rgba(67,160,71,.55); border-color: #a5d6a7; }
   .day.today { border-color: #fff176; background: rgba(255,193,7,.35); animation: pulse 1s infinite; }
   .day.big { grid-column: span 3; display: flex; align-items: center; justify-content: center; gap: 14px; }
@@ -150,6 +153,7 @@
     pointer-events: none; white-space: nowrap;
   }
   #toast.show { opacity: 1; }
+  #toast .ic { font-size: 16px; }
 </style>
 </head>
 <body>
@@ -224,8 +228,8 @@
 <!-- APP -->
 <div id="app">
   <div class="topbar">
-    <div class="pill"><svg class="ic" viewBox="0 0 100 100" style="font-size:22px"><use href="#rice"/></svg> <span id="uname">Farmer</span></div>
-    <div class="pill">🪙 <span id="coins">0</span></div>
+    <div class="pill">👤 <span id="uname">Farmer</span></div>
+    <div class="pill"><svg class="ic" viewBox="0 0 100 100" style="font-size:22px"><use href="#rice"/></svg> <span id="coins">0</span></div>
   </div>
 
   <!-- HOME PAGE -->
@@ -308,6 +312,7 @@
   function ic(name) {
     return '<svg class="ic" viewBox="0 0 100 100"><use href="#' + name + '"/></svg>';
   }
+  const R = ic("rice"); // rice = game currency icon
 
   /* ---------- DATA ---------- */
   const CROPS = {
@@ -329,7 +334,7 @@
   function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
   function toast(m) {
     const t = document.getElementById("toast");
-    t.innerText = m; t.classList.add("show");
+    t.innerHTML = m; t.classList.add("show");
     clearTimeout(toast.id);
     toast.id = setTimeout(() => t.classList.remove("show"), 1800);
   }
@@ -356,12 +361,11 @@
 
   function claimedToday() { return state.lastBonus === today(); }
 
-  // how many days of the current chain are completed (0..7)
   function chain() {
     if (!state.lastBonus) return 0;
     if (state.lastBonus === today()) return state.streak;
     if (state.lastBonus === yesterday()) return state.streak >= 7 ? 0 : state.streak;
-    return 0; // missed a day -> restart
+    return 0;
   }
 
   function claimBonus() {
@@ -372,7 +376,7 @@
     state.streak = day;
     state.lastBonus = today();
     save(); haptic();
-    toast("🎁 Day " + day + ": +" + reward + " coins!");
+    toast("🎁 Day " + day + ": +" + reward + " " + R);
     render();
   }
   document.getElementById("claimBtn").onclick = claimBonus;
@@ -385,7 +389,7 @@
     const p = state.plots[i];
     if (!p) {
       const c = CROPS[selected];
-      if (state.coins < c.cost) { toast("Not enough coins 🪙"); return; }
+      if (state.coins < c.cost) { toast("Not enough " + R); return; }
       state.coins -= c.cost;
       state.plots[i] = { c: selected, t: Date.now() };
       haptic();
@@ -395,7 +399,7 @@
       if (left > 0) { toast("Not ready yet ⏳"); return; }
       state.coins += c.sell;
       state.plots[i] = null;
-      toast("+" + c.sell + " 🪙");
+      toast("+" + c.sell + " " + R);
       haptic();
     }
     save(); render();
@@ -404,7 +408,7 @@
   function buyPlot() {
     if (state.plots.length >= MAX_PLOTS) return;
     const cost = plotCost();
-    if (state.coins < cost) { toast("Not enough coins 🪙"); return; }
+    if (state.coins < cost) { toast("Not enough " + R); return; }
     state.coins -= cost;
     state.plots.push(null);
     haptic(); save(); render();
@@ -421,14 +425,12 @@
     const cur = chain();
     const nextDay = Math.min(7, cur + 1);
 
-    // home bonus card
     const badge = document.getElementById("bonusBadge");
     document.getElementById("bonusDesc").innerText = done ? "Come back tomorrow" : "Day " + nextDay + " reward ready";
     badge.innerText = done ? "CLAIMED" : "+" + DAY_REWARD[nextDay - 1];
     badge.className = "badge" + (done ? " ok" : "");
     document.getElementById("bonusCard").classList.toggle("dim", done);
 
-    // daily page
     if (isOn("daily")) {
       document.getElementById("dStatus").innerText = done
         ? "Claimed! Come back tomorrow for Day " + (state.streak >= 7 ? 1 : state.streak + 1)
@@ -441,23 +443,22 @@
         if (d === 7) cls += " big";
         const tick = d <= cur ? '<span class="tick">✅</span>' : "";
         if (d === 7) {
-          return '<div class="' + cls + '">' + tick + '<div class="dg">🎁</div><div><div class="dn">DAY 7</div><div class="dr">🪙 ' + r + '</div></div></div>';
+          return '<div class="' + cls + '">' + tick + '<div class="dg">🎁</div><div><div class="dn">DAY 7</div><div class="dr">' + R + ' ' + r + '</div></div></div>';
         }
-        return '<div class="' + cls + '">' + tick + '<div class="dn">DAY ' + d + '</div><div class="dg">🎁</div><div class="dr">🪙 ' + r + '</div></div>';
+        return '<div class="' + cls + '">' + tick + '<div class="dn">DAY ' + d + '</div><div class="dg">🎁</div><div class="dr">' + R + ' ' + r + '</div></div>';
       }).join("");
       const b = document.getElementById("claimBtn");
       if (done) { b.innerText = "✅ CLAIMED TODAY"; b.classList.add("off"); }
-      else { b.innerText = "🎁 CLAIM DAY " + nextDay + " (+" + DAY_REWARD[nextDay - 1] + ")"; b.classList.remove("off"); }
+      else { b.innerHTML = "🎁 CLAIM DAY " + nextDay + " (+" + DAY_REWARD[nextDay - 1] + " " + R + ")"; b.classList.remove("off"); }
     }
 
-    // farm page
     if (!isOn("farm")) return;
 
     document.getElementById("crops").innerHTML = Object.keys(CROPS).map(k => {
       const c = CROPS[k];
       return '<div class="crop ' + (k === selected ? "sel" : "") + '" onclick="selectCrop(\'' + k + '\')">' +
         '<span class="em">' + ic(k) + '</span>' + c.n +
-        '<br><small>🪙' + c.cost + ' → ' + c.sell + '</small><br><small>⏱ ' + c.time + 's</small></div>';
+        '<br><small>' + R + c.cost + ' → ' + c.sell + '</small><br><small>⏱ ' + c.time + 's</small></div>';
     }).join("");
 
     document.getElementById("grid").innerHTML = state.plots.map((p, i) => {
@@ -470,7 +471,7 @@
 
     const bp = document.getElementById("buyPlot");
     if (state.plots.length >= MAX_PLOTS) bp.style.display = "none";
-    else { bp.style.display = "block"; bp.innerText = "➕ BUY NEW FIELD (🪙 " + plotCost() + ")"; }
+    else { bp.style.display = "block"; bp.innerHTML = "➕ BUY NEW FIELD (" + R + " " + plotCost() + ")"; }
   }
 
   const user = tg.initDataUnsafe && tg.initDataUnsafe.user;
@@ -501,4 +502,4 @@
   }, 50);
 </script>
 </body>
-       </html>
+ </html>
